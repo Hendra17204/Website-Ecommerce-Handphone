@@ -1,0 +1,40 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';  
+
+/* app.css */  
+:root {  
+    --primary-green: #4CAF50;  
+  }  
+
+  
+/* Reset dasar */  
+* {  
+    box-sizing: border-box;  
+    margin: 0;  
+    padding: 0;  
+}  
+body {  
+    background: var(--primary-green); /* Use the variable here */  
+    /* ... other styles ... */  
+}  
+  
+.overlay {  
+    background: linear-gradient(to right, var(--primary-green), #66bb6a); /* Use the variable here */  
+    /* ... other styles ... */  
+}  
+  
+button {  
+    border: 1px solid var(--primary-green); /* Use the variable here */  
+    background-color: var(--primary-green); /* Use the variable here */  
+    /* ... other styles ... */  
+}  
+
+.bg-primary-green {  
+    background-color: var(--primary-green);  
+  }  
+
+  :root {  
+    --primary-green: #4CAF50;  
+    --light-green: #81c784;  
+    --dark-green: #388e82;  
+  }  
+  
