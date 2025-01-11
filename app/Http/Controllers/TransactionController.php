@@ -8,11 +8,23 @@ use Illuminate\Http\Request;
 
 class TransactionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $transactions = Transaction::with('product', 'user')->get(); // Ambil semua transaksi dengan relasi  
+        $search = $request->input('search');
+        $entries = $request->input('entries', 10); // Default to 10 if not set  
+
+        $transactions = Transaction::with(['product', 'user']) // Pastikan untuk memuat relasi  
+            ->when($search, function ($query) use ($search) {
+                return $query->whereHas('product', function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%');
+                })->orWhereHas('user', function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%');
+                });
+            })->paginate($entries);
+
         return view('transactions.index', compact('transactions'));
     }
+
 
     public function confirm(Request $request, $id)
     {
@@ -22,24 +34,34 @@ class TransactionController extends Controller
 
     public function purchase(Request $request, $id)
     {
-        // Validasi input  
+        // Validasi input    
         $request->validate([
-            'payment_method' => 'required|string', // Pastikan payment_method tidak null  
+            'quantity' => 'required|integer|min:1', // Tambahkan validasi untuk jumlah  
+            'payment_method' => 'required|string', // Pastikan payment_method tidak null    
         ]);
 
-        // Temukan produk berdasarkan ID  
+        // Temukan produk berdasarkan ID    
         $product = Product::findOrFail($id);
 
-        // Simulasi penyimpanan transaksi  
+        // Cek apakah jumlah yang diminta tersedia  
+        if ($request->quantity > $product->quantity) {
+            return redirect()->back()->with('error', 'Jumlah produk yang diminta melebihi stok yang tersedia.');
+        }
+
+        // Simulasi penyimpanan transaksi    
         Transaction::create([
-            'user_id' => auth()->id(), // ID pengguna yang melakukan pembelian  
+            'user_id' => auth()->id(), // ID pengguna yang melakukan pembelian    
             'product_id' => $product->id,
-            'payment_method' => $request->payment_method, // Ambil nilai dari request  
-            'amount' => $product->price,
-            'status' => 'pending', // Status bisa diatur sesuai kebutuhan  
+            'payment_method' => $request->payment_method, // Ambil nilai dari request    
+            'amount' => $product->price * $request->quantity, // Hitung total harga  
+            'status' => 'pending', // Status bisa diatur sesuai kebutuhan    
         ]);
 
-        // Redirect ke halaman sukses atau halaman lain  
+        // Kurangi jumlah produk yang tersedia  
+        $product->quantity -= $request->quantity;
+        $product->save();
+
+        // Redirect ke halaman sukses atau halaman lain    
         return redirect()->route('dashboard')->with('success', 'Pembelian berhasil dilakukan.');
     }
 }

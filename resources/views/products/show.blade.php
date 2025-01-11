@@ -2,6 +2,8 @@
 
 @section('content')
     <div class="container my-5">
+        <a href="{{ url()->previous() }}" class="btn btn-outline-secondary mb-3"> <i class="fas fa-arrow-left"></i>
+            Kembali</a>
         <div class="row">
             <div class="col-md-6">
                 <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('path/to/default/image.jpg') }}"

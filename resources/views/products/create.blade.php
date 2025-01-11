@@ -3,6 +3,8 @@
 
     @section('content')
         <div class="container mt-5">
+            <a href="{{ url()->previous() }}" class="btn btn-outline-secondary mb-3"> <i class="fas fa-arrow-left"></i>
+                Kembali</a>
             <h2 class="text-center mb-4">Tambah Produk Handphone</h2>
             <form method="POST" action="{{ route('products.store') }}" enctype="multipart/form-data"
                 class="row g-3 needs-validation" novalidate>

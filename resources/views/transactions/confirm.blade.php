@@ -4,6 +4,8 @@
     <div class="container my-5">
         <div class="card shadow-lg border-0 rounded-lg">
             <div class="card-body">
+                <a href="{{ url()->previous() }}" class="btn btn-outline-secondary mb-3"> <i class="fas fa-arrow-left"></i>
+                    Kembali</a>
                 <h2 class="text-center mb-4">Konfirmasi Pembelian</h2>
                 <div class="text-center mb-4">
                     <img src="{{ $product->image ? asset('storage/' . $product->image) : asset('path/to/default/image.jpg') }}"
@@ -19,7 +21,7 @@
                     <dd class="col-sm-8">{{ $product->quantity }}</dd>
                 </dl>
 
-                <form action="{{ route('products.purchase', $product) }}" method="POST">
+                <form action="{{ route('products.purchase', $product->id) }}" method="POST">
                     @csrf
                     <div class="mb-3">
                         <label for="quantity" class="form-label">Jumlah</label>
@@ -47,18 +49,18 @@
     <script>
         const quantityInput = document.getElementById('quantity');
         const totalInput = document.getElementById('total');
-        const unitPrice = {{ $product->price }}; // Get unit price from Blade  
+        const unitPrice = {{ $product->price }}; // Get unit price from Blade    
 
         quantityInput.addEventListener('input', () => {
-            const quantity = parseInt(quantityInput.value, 10) || 1; // Handle empty input  
+            const quantity = parseInt(quantityInput.value, 10) || 1; // Handle empty input    
             const totalPrice = quantity * unitPrice;
-            totalInput.value = 'Rp ' + totalPrice.toLocaleString('id-ID', {
+            totalInput.value = totalPrice.toLocaleString('id-ID', {
                 style: 'currency',
                 currency: 'IDR'
-            });
+            }).replace('IDR', ''); // Menghapus 'IDR' yang ditambahkan oleh toLocaleString  
         });
 
-        // Initial calculation  
+        // Initial calculation    
         quantityInput.dispatchEvent(new Event('input'));
     </script>
 @endsection

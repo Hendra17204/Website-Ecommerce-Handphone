@@ -11,13 +11,30 @@
             @endif
 
             <h1 class="text-center mb-4">Daftar Produk</h1>
+
             <div class="d-flex justify-content-between mb-3">
-                <a href="{{ route('products.create') }}" class="btn btn-success">Tambah Produk</a>
-                <form action="{{ route('products.index') }}" method="GET" class="d-flex">
-                    <input type="text" name="search" placeholder="Cari produk..." class="form-control me-2"
-                        style="width: auto;">
-                    <button type="submit" class="btn btn-primary">Cari</button>
-                </form>
+                <div class="d-flex align-items-center">
+                    <p class="mb-0 me-2">Tampilkan</p>
+                    <form action="{{ route('products.index') }}" method="GET" class="d-flex">
+                        <select name="entries" class="form-select me-2" onchange="this.form.submit()">
+                            <option value="10" {{ request('entries') == 10 ? 'selected' : '' }}>10</option>
+                            <option value="25" {{ request('entries') == 25 ? 'selected' : '' }}>25</option>
+                            <option value="50" {{ request('entries') == 50 ? 'selected' : '' }}>50</option>
+                            <option value="100" {{ request('entries') == 100 ? 'selected' : '' }}>100</option>
+                        </select>
+                        <input type="hidden" name="search" value="{{ request('search') }}">
+                    </form>
+                    <p class="mb-0">Data</p>
+                </div>
+
+                <div class="d-flex">
+                    <a href="{{ route('products.create') }}" class="btn btn-success me-2">Tambah Produk</a>
+                    <form action="{{ route('products.index') }}" method="GET" class="d-flex">
+                        <input type="text" name="search" placeholder="Cari produk..." class="form-control me-2"
+                            style="width: auto;">
+                        <button type="submit" class="btn btn-primary">Cari</button>
+                    </form>
+                </div>
             </div>
 
             <div class="table-responsive">
@@ -59,7 +76,42 @@
                 </table>
             </div>
 
-            {{ $products->links() }}
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div>
+                    Menampilkan {{ $products->count() }} dari {{ $products->total() }} entri
+                </div>
+                <div>
+                    <nav>
+                        <ul class="pagination">
+                            @if ($products->onFirstPage())
+                                <li class="page-item disabled">
+                                    <span class="page-link">Previous</span>
+                                </li>
+                            @else
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $products->previousPageUrl() }}">Previous</a>
+                                </li>
+                            @endif
+
+                            @foreach ($products->getUrlRange(1, $products->lastPage()) as $page => $url)
+                                <li class="page-item {{ $page == $products->currentPage() ? 'active' : '' }}">
+                                    <a class="page-link" href="{{ $url }}">{{ $page }}</a>
+                                </li>
+                            @endforeach
+
+                            @if ($products->hasMorePages())
+                                <li class="page-item">
+                                    <a class="page-link" href="{{ $products->nextPageUrl() }}">Next</a>
+                                </li>
+                            @else
+                                <li class="page-item disabled">
+                                    <span class="page-link">Next</span>
+                                </li>
+                            @endif
+                        </ul>
+                    </nav>
+                </div>
+            </div>
         </div>
     @endsection
 @endif
